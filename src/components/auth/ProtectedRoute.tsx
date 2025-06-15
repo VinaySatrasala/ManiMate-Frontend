@@ -12,10 +12,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#121212]">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-12 h-12 border-4 border-gray-600 border-t-[#2EEE2E] rounded-full animate-spin"></div>
-          <p className="text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Animated background blobs */}
+        <div className="floating-blob blob-1"></div>
+        <div className="floating-blob blob-2"></div>
+        <div className="floating-blob blob-3"></div>
+        
+        <div className="relative z-10 flex flex-col items-center space-y-6">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+          <div className="glass-dark px-8 py-4 rounded-2xl">
+            <p className="text-white font-medium">Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -28,4 +35,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

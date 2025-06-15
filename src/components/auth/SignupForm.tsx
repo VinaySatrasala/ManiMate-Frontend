@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { Eye, EyeOff, User, Lock, UserPlus } from 'lucide-react';
 
 const SignupForm = () => {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { signup } = useAuth();
 
@@ -20,96 +22,133 @@ const SignupForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#121212] px-4">
-      <div className="max-w-md w-full space-y-8 bg-[#1E1E1E] p-8 rounded-xl border border-[#333333]">
-        <div>
-          <div className="w-16 h-16 rounded-full bg-[#2EEE2E] flex items-center justify-center mx-auto mb-4">
-            <span className="text-black font-bold text-2xl">M</span>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4">
+      {/* Animated background blobs */}
+      <div className="floating-blob blob-1"></div>
+      <div className="floating-blob blob-2"></div>
+      <div className="floating-blob blob-3"></div>
+
+      <div className="relative z-10 max-w-md w-full">
+        <div className="glass-dark p-10 rounded-3xl neo-shadow">
+          {/* Logo */}
+          <div className="w-20 h-20 rounded-2xl glass flex items-center justify-center mx-auto mb-8 pulse-glow">
+            <span className="text-white font-bold text-3xl">M</span>
           </div>
-          <h2 className="text-center text-3xl font-bold text-white">
-            Create Account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            Join ManiMate to start creating amazing animations
-          </p>
-        </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-white mb-3">
+              Create Account
+            </h2>
+            <p className="text-white/70 text-lg">
+              Join ManiMate to start creating amazing animations
+            </p>
+          </div>
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="username" className="text-sm font-medium text-gray-300">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="glass p-4 rounded-2xl border border-red-400/30 text-red-300 text-sm text-center">
+                {error}
+              </div>
+            )}
+
+            {/* Username field */}
+            <div className="space-y-2">
+              <label htmlFor="username" className="text-sm font-medium text-white/80">
                 Username
               </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#2EEE2E] focus:ring-1 focus:ring-[#2EEE2E]"
-                placeholder="Choose a username"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-white/50" />
+                </div>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 glass-dark rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                  placeholder="Choose a username"
+                />
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="name" className="text-sm font-medium text-gray-300">
+            {/* Full name field */}
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium text-white/80">
                 Full Name
               </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#2EEE2E] focus:ring-1 focus:ring-[#2EEE2E]"
-                placeholder="Enter your full name"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <UserPlus className="h-5 w-5 text-white/50" />
+                </div>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 glass-dark rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                  placeholder="Enter your full name"
+                />
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="text-sm font-medium text-gray-300">
+            {/* Password field */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-white/80">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#2EEE2E] focus:ring-1 focus:ring-[#2EEE2E]"
-                placeholder="Create a password"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-white/50" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-12 pr-12 py-4 glass-dark rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                  placeholder="Create a password"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-white/50 hover:text-white/80 transition-colors" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-white/50 hover:text-white/80 transition-colors" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div>
+            {/* Submit button */}
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-black bg-[#2EEE2E] hover:bg-[#25C825] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2EEE2E]"
+              className="w-full py-4 glass rounded-2xl font-medium text-white hover:bg-white/20 transition-all duration-300 neo-shadow smooth-hover"
             >
               Sign up
             </button>
-          </div>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-400">Already have an account? </span>
-            <Link to="/login" className="text-[#2EEE2E] hover:text-[#25C825]">
-              Sign in
-            </Link>
-          </div>
-        </form>
+            {/* Sign in link */}
+            <div className="text-center text-sm">
+              <span className="text-white/70">Already have an account? </span>
+              <Link to="/login" className="text-white hover:text-white/80 font-medium transition-colors">
+                Sign in
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
 
-export default SignupForm; 
+export default SignupForm;

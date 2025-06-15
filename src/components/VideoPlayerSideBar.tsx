@@ -1,18 +1,19 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
 import { useChatContext } from '../context/ChatContext';
+import { Download, Share2, Play, Loader } from 'lucide-react';
 
 // Thinking Loader Component
 const ThinkingLoader = () => {
   return (
-    <div className="flex items-center justify-center p-8">
-      <div className="flex flex-col items-center space-y-4">
+    <div className="flex items-center justify-center p-12">
+      <div className="flex flex-col items-center space-y-6">
         <div className="relative">
-          <div className="w-12 h-12 border-4 border-gray-600 border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
         </div>
         <div className="text-center">
-          <h3 className="text-white font-medium text-sm">Thinking...</h3>
-          <p className="text-gray-400 text-xs mt-1">Processing your request</p>
+          <h3 className="text-white font-medium text-lg">Thinking...</h3>
+          <p className="text-white/60 text-sm mt-2">Processing your request</p>
         </div>
       </div>
     </div>
@@ -22,26 +23,24 @@ const ThinkingLoader = () => {
 // Generating Video Loader Component
 const GeneratingVideoLoader = () => {
   return (
-    <div className="flex items-center justify-center p-8">
-      <div className="flex flex-col items-center space-y-4">
+    <div className="flex items-center justify-center p-12">
+      <div className="flex flex-col items-center space-y-6">
         <div className="relative">
           {/* Animated video icon */}
-          <div className="w-16 h-12 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
-            <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM5 8a1 1 0 000 2h8a1 1 0 100-2H5z"/>
-            </svg>
+          <div className="w-20 h-16 glass rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            <Play className="w-8 h-8 text-white" />
           </div>
           {/* Progress dots */}
-          <div className="flex space-x-1 mt-3 justify-center">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div className="flex space-x-2 mt-4 justify-center">
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
         </div>
         <div className="text-center">
-          <h3 className="text-white font-medium text-sm">Generating Video...</h3>
-          <p className="text-gray-400 text-xs mt-1">This may take a few moments</p>
+          <h3 className="text-white font-medium text-lg">Generating Video...</h3>
+          <p className="text-white/60 text-sm mt-2">This may take a few moments</p>
         </div>
       </div>
     </div>
@@ -73,12 +72,12 @@ const VideoPlayerSidebar = () => {
     if (isVideoReady && videoUrl) {
       return (
         <>
-          <div className="bg-black rounded-lg overflow-hidden">
+          <div className="glass-dark rounded-2xl overflow-hidden neo-shadow">
             <ReactPlayer
               url={videoUrl}
               controls
               width="100%"
-              height="240px"
+              height="280px"
               config={{
                 file: {
                   attributes: {
@@ -90,12 +89,12 @@ const VideoPlayerSidebar = () => {
           </div>
 
           {/* Video Info */}
-          <div className="mt-4 space-y-2">
-            <h3 className="text-white font-medium text-sm line-clamp-2">
+          <div className="mt-6 space-y-3">
+            <h3 className="text-white font-semibold text-lg">
               Generated Animation
             </h3>
-            <p className="text-gray-400 text-xs">
-              Your custom animated video is ready
+            <p className="text-white/60 text-sm leading-relaxed">
+              Your custom animated video is ready to view and download
             </p>
           </div>
         </>
@@ -104,24 +103,24 @@ const VideoPlayerSidebar = () => {
     
     // Default placeholder when no video
     return (
-      <div className="bg-black rounded-lg overflow-hidden h-[240px] flex items-center justify-center">
+      <div className="glass-dark rounded-2xl overflow-hidden h-[280px] flex items-center justify-center neo-shadow">
         <div className="text-center">
-          <svg className="w-12 h-12 text-gray-600 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM5 8a1 1 0 000 2h8a1 1 0 100-2H5z"/>
-          </svg>
-          <p className="text-gray-400 text-sm">No video yet</p>
-          <p className="text-gray-500 text-xs mt-1">Start a conversation to generate content</p>
+          <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Play className="w-8 h-8 text-white/60" />
+          </div>
+          <p className="text-white font-medium mb-2">No video yet</p>
+          <p className="text-white/60 text-sm">Start a conversation to generate content</p>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="w-[420px] border-l border-[#252525] bg-[#1a1a1a] flex flex-col">
+    <div className="w-[480px] glass-dark border-l border-white/10 flex flex-col">
       {/* Video Player Header */}
-      <div className="p-4 border-b border-[#252525]">
-        <h2 className="text-lg font-medium text-white">Video Player</h2>
-        <p className="text-sm text-gray-400 mt-1">
+      <div className="p-8 border-b border-white/10">
+        <h2 className="text-2xl font-semibold text-white mb-2">Video Player</h2>
+        <p className="text-white/60">
           {isThinking ? 'Processing request...' : 
            isPolling ? 'Generating video...' : 
            isVideoReady ? 'Video ready!' : 
@@ -130,24 +129,25 @@ const VideoPlayerSidebar = () => {
       </div>
 
       {/* Video Player Container */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-8">
         {renderVideoContent()}
       </div>
 
       {/* Video Controls/Options */}
-      <div className="p-4 border-t border-[#252525]">
-        <div className="flex space-x-2">
+      <div className="p-8 border-t border-white/10">
+        <div className="flex space-x-4">
           <button 
-            className="flex-1 px-3 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white text-sm rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 glass hover:bg-white/20 text-white rounded-2xl transition-all smooth-hover disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isVideoReady}
           >
+            <Download size={18} />
             Download
           </button>
           <button 
-            className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white text-sm rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 glass hover:bg-white/20 text-white rounded-2xl transition-all smooth-hover disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isVideoReady}
           >
-            Share
+            <Share2 size={18} />
           </button>
         </div>
       </div>

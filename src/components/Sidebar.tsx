@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useChatContext } from '../context/ChatContext';
-import { Plus, Trash2, LogOut, Menu, X } from 'lucide-react';
+import { Plus, Trash2, LogOut, Menu, X, MessageSquare } from 'lucide-react';
 
 const Sidebar = () => {
   const { logout, user } = useAuth();
@@ -35,58 +35,61 @@ const Sidebar = () => {
     <>
       {/* Mobile menu button */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#1E1E1E] border border-[#333333]"
+        className="lg:hidden fixed top-6 left-6 z-50 p-3 glass-dark rounded-2xl neo-shadow"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
-        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        {isMobileMenuOpen ? <X size={24} className="text-white" /> : <Menu size={24} className="text-white" />}
       </button>
 
       {/* Sidebar */}
       <div className={`
-        fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#1E1E1E] border-r border-[#333333] transform transition-transform duration-200 ease-in-out
+        fixed lg:static inset-y-0 left-0 z-40 w-80 glass-dark border-r border-white/10 transform transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full p-6">
           {/* User info */}
-          <div className="p-4 border-b border-[#333333]">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-[#2EEE2E] flex items-center justify-center">
-                <span className="text-black font-bold">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
+          <div className="glass p-6 rounded-2xl mb-8 neo-shadow">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center pulse-glow">
+                <span className="text-white font-bold text-lg">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user?.name || 'User'}</p>
-                <p className="text-xs text-gray-400 truncate">@{user?.username}</p>
+                <p className="text-lg font-medium text-white truncate">{user?.name || 'User'}</p>
+                <p className="text-sm text-white/60 truncate">@{user?.username}</p>
               </div>
             </div>
           </div>
 
           {/* Sessions list */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-medium text-gray-400">Sessions</h2>
+          <div className="flex-1 overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Sessions
+              </h2>
               <button
                 onClick={() => setIsCreatingSession(true)}
-                className="p-1 rounded-lg hover:bg-[#252525] text-gray-400 hover:text-white"
+                className="p-2 glass rounded-xl hover:bg-white/20 text-white transition-all smooth-hover"
               >
-                <Plus size={18} />
+                <Plus size={20} />
               </button>
             </div>
 
             {/* New session form */}
             {isCreatingSession && (
-              <form onSubmit={handleCreateSession} className="mb-4">
+              <form onSubmit={handleCreateSession} className="mb-6">
                 <input
                   type="text"
                   value={newSessionName}
                   onChange={(e) => setNewSessionName(e.target.value)}
                   placeholder="New session name"
-                  className="w-full px-3 py-2 bg-[#252525] border border-[#333333] rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:border-[#2EEE2E]"
+                  className="w-full px-4 py-3 glass-dark rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all mb-3"
                   autoFocus
                 />
-                <div className="flex space-x-2 mt-2">
+                <div className="flex space-x-3">
                   <button
                     type="submit"
-                    className="flex-1 px-3 py-1 bg-[#2EEE2E] text-black text-sm rounded-lg hover:bg-[#25C825]"
+                    className="flex-1 px-4 py-2 glass text-white rounded-xl hover:bg-white/20 transition-all font-medium"
                   >
                     Create
                   </button>
@@ -96,7 +99,7 @@ const Sidebar = () => {
                       setIsCreatingSession(false);
                       setNewSessionName('');
                     }}
-                    className="px-3 py-1 bg-[#252525] text-gray-400 text-sm rounded-lg hover:bg-[#333333] hover:text-white"
+                    className="px-4 py-2 glass-dark text-white/70 rounded-xl hover:bg-white/10 hover:text-white transition-all"
                   >
                     Cancel
                   </button>
@@ -105,19 +108,19 @@ const Sidebar = () => {
             )}
 
             {/* Sessions */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               {sessions.map((session) => (
                 <div
                   key={session.id}
                   className={`
-                    flex items-center justify-between p-2 rounded-lg cursor-pointer group
-                    ${currentSession?.id === session.id ? 'bg-[#252525]' : 'hover:bg-[#252525]'}
+                    flex items-center justify-between p-4 rounded-2xl cursor-pointer group transition-all smooth-hover
+                    ${currentSession?.id === session.id ? 'glass neo-shadow' : 'glass-dark hover:bg-white/10'}
                   `}
                   onClick={() => switchSession(session.id)}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{session.name}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-white font-medium truncate">{session.name}</p>
+                    <p className="text-sm text-white/60">
                       {new Date(session.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -126,7 +129,7 @@ const Sidebar = () => {
                       e.stopPropagation();
                       handleDeleteSession(session.id);
                     }}
-                    className="p-1 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-gray-400 hover:text-red-500"
+                    className="p-2 rounded-xl opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-white/60 hover:text-red-400 transition-all"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -136,13 +139,13 @@ const Sidebar = () => {
           </div>
 
           {/* Logout button */}
-          <div className="p-4 border-t border-[#333333]">
+          <div className="pt-6 border-t border-white/10">
             <button
               onClick={logout}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-[#252525] text-gray-400 rounded-lg hover:bg-red-500/10 hover:text-red-500"
+              className="w-full flex items-center justify-center space-x-3 px-6 py-4 glass-dark text-white/80 rounded-2xl hover:bg-red-500/20 hover:text-red-300 transition-all smooth-hover"
             >
-              <LogOut size={18} />
-              <span>Logout</span>
+              <LogOut size={20} />
+              <span className="font-medium">Logout</span>
             </button>
           </div>
         </div>
@@ -151,7 +154,7 @@ const Sidebar = () => {
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

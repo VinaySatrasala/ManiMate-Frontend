@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Sparkles } from 'lucide-react';
 import { useChatContext } from '../context/ChatContext';
 
 const ChatInput = () => {
@@ -16,10 +16,10 @@ const ChatInput = () => {
   
   return (
     <form onSubmit={handleSubmit}>
-      <div className="flex items-center bg-[#252525] rounded-xl shadow-lg overflow-hidden">
-        <div className="w-10 h-10 flex items-center justify-center ml-2">
-          <div className="w-6 h-6 rounded-full bg-[#2EEE2E] flex items-center justify-center">
-            <span className="text-black font-bold text-xs">A</span>
+      <div className="flex items-center glass-dark rounded-3xl neo-shadow overflow-hidden">
+        <div className="w-14 h-14 flex items-center justify-center ml-4">
+          <div className="w-10 h-10 rounded-2xl glass flex items-center justify-center pulse-glow">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
         </div>
         
@@ -27,20 +27,20 @@ const ChatInput = () => {
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message here..."
-          className="flex-1 bg-transparent border-none focus:outline-none py-4 px-3 text-sm"
+          placeholder="Describe your animation idea..."
+          className="flex-1 bg-transparent border-none focus:outline-none py-5 px-4 text-white placeholder-white/50 text-lg"
         />
         
         <button 
           type="submit"
           disabled={!message.trim()}
-          className={`p-4 ${
+          className={`p-4 m-2 rounded-2xl transition-all duration-300 ${
             message.trim() 
-              ? 'bg-[#2EEE2E] text-black hover:bg-[#25C825]' 
-              : 'bg-[#333333] text-gray-500'
-          } transition-colors`}
+              ? 'glass text-white hover:bg-white/20 smooth-hover' 
+              : 'glass-dark text-white/30 cursor-not-allowed'
+          }`}
         >
-          <Send size={20} />
+          <Send size={24} />
         </button>
       </div>
     </form>
