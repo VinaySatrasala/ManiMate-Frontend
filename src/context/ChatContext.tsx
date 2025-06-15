@@ -1,5 +1,20 @@
 import axios from 'axios';
-import { createContext, useContext, useState, useRef } from 'react';
+import { createContext, useContext, useState, useRef, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+
+interface Message {
+  sender: 'user' | 'animate';
+  content: string;
+  type?: string;
+  filename?: string;
+}
+
+interface Session {
+  id: string;
+  name: string;
+  created_at: string;
+  prompts_count: number;
+}
 
 interface ChatContextType {
   messages: Message[];
@@ -8,13 +23,11 @@ interface ChatContextType {
   isVideoReady: boolean;
   videoUrl: string | null;
   isPolling: boolean;
-}
-
-interface Message {
-  sender: 'user' | 'animate';
-  content: string;
-  type?: 'code' | 'error';
-  filename?: string;
+  sessions: Session[];
+  currentSession: Session | null;
+  createSession: (name: string) => Promise<void>;
+  deleteSession: (sessionId: string) => Promise<void>;
+  switchSession: (sessionId: string) => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -25,33 +38,76 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [currentSession, setCurrentSession] = useState<Session | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { isAuthenticated } = useAuth();
+
+  // Fetch sessions on mount and when authentication changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchSessions();
+    }
+  }, [isAuthenticated]);
+
+  const fetchSessions = async () => {
+    try {
+      const response = await axios.get('/sessions');
+      setSessions(response.data.sessions);
+      // Set the most recent session as current if none is selected
+      if (!currentSession && response.data.sessions.length > 0) {
+        setCurrentSession(response.data.sessions[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+    }
+  };
+
+  const createSession = async (name: string) => {
+    try {
+      const response = await axios.post('/create-session', { session_name: name });
+      const newSession = response.data.session;
+      setSessions(prev => [...prev, newSession]);
+      setCurrentSession(newSession);
+      setMessages([]); // Clear messages for new session
+    } catch (error) {
+      console.error('Error creating session:', error);
+      throw error;
+    }
+  };
+
+  const deleteSession = async (sessionId: string) => {
+    try {
+      await axios.post('/delete-session', { session_id: sessionId });
+      setSessions(prev => prev.filter(session => session.id !== sessionId));
+      if (currentSession?.id === sessionId) {
+        setCurrentSession(null);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      throw error;
+    }
+  };
+
+  const switchSession = async (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (session) {
+      setCurrentSession(session);
+      setMessages([]); // Clear messages when switching sessions
+    }
+  };
 
   const checkVideoStatus = async (filename: string) => {
     try {
-      const response = await axios.post(
-        `http://localhost:3000/getvideo`,
-        { filename },
-        {
-          timeout: 5000,
-        }
-      );
-
-      // If video is ready, stop polling and set the video URL
+      const response = await axios.post('/getvideo', { filename });
       if (response.status === 200 && response.data.video_url) {
-        console.log('Video is ready!');
         stopPolling();
-        
-        // Set the video URL from backend
         const fullVideoUrl = `http://localhost:3000${response.data.video_url}`;
         setVideoUrl(fullVideoUrl);
         setIsVideoReady(true);
-        
-        console.log('Video URL received:', fullVideoUrl);
       }
-      
     } catch (error) {
-      // Video not ready yet, continue polling
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         console.log('Video not ready yet, continuing to poll...');
       } else {
@@ -62,11 +118,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   const startPolling = (filename: string) => {
     setIsPolling(true);
-    console.log('Starting video polling for:', filename);
-    
     pollingIntervalRef.current = setInterval(() => {
       checkVideoStatus(filename);
-    }, 1000); // Poll every 1 second
+    }, 1000);
   };
 
   const stopPolling = () => {
@@ -75,14 +129,14 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       pollingIntervalRef.current = null;
     }
     setIsPolling(false);
-    console.log('Stopped video polling');
   };
 
   const sendMessage = async (content: string) => {
-    // Stop any existing polling
+    if (!currentSession) {
+      throw new Error('No active session');
+    }
+
     stopPolling();
-    
-    // Reset video states
     setIsVideoReady(false);
     setVideoUrl(null);
     setVideoFileName(null);
@@ -90,21 +144,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setMessages(prev => [...prev, { sender: 'user', content }]);
 
     try {
-      const response = await axios.post('http://localhost:3000/generate', 
-        { prompt: content },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
-      );
+      const response = await axios.post('/generate', {
+        prompt: content,
+        session_id: currentSession.id
+      });
 
-      // Store the filename from the generate response
       if (response.data.filename) {
         setVideoFileName(response.data.filename);
-        
-        // Start polling for video readiness
         startPolling(response.data.filename);
       }
 
@@ -131,18 +177,25 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Cleanup function
-  const cleanup = () => {
-    stopPolling();
-  };
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, []);
 
   return (
-    <ChatContext.Provider value={{ 
-      messages, 
-      sendMessage, 
-      videoFileName, 
-      isVideoReady, 
+    <ChatContext.Provider value={{
+      messages,
+      sendMessage,
+      videoFileName,
+      isVideoReady,
       videoUrl,
-      isPolling
+      isPolling,
+      sessions,
+      currentSession,
+      createSession,
+      deleteSession,
+      switchSession
     }}>
       {children}
     </ChatContext.Provider>
@@ -151,6 +204,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useChatContext = () => {
   const context = useContext(ChatContext);
-  if (!context) throw new Error('useChatContext must be used within ChatProvider');
+  if (!context) {
+    throw new Error('useChatContext must be used within ChatProvider');
+  }
   return context;
 };
